@@ -1,0 +1,19 @@
+{
+  "domain": "dawarizer",
+  "name": "Dawarizer",
+  "version": "1.0.0",
+  "documentation": "https://www.home-assistant.io/integrations/dawarizer",
+  "issue_tracker": "https://github.com/your-github-username/home-assistant-dawarizer/issues",
+  "dependencies": [],
+  "codeowners": [
+    "@your-github-username"
+  ],
+  "requirements": [
+    "requests",
+    "matplotlib"
+  ],
+  "platforms": [
+    "sensor"
+  ]
+  "iot_class": "cloud_polling"
+}
