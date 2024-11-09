@@ -1,9 +1,13 @@
-from custom_components.dawarizer.const import NOMINATIM_URL
+import asyncio 
 from datetime import datetime, timedelta
-from homeassistant.helpers.entity import Entity
 import logging
-import matplotlib.pyplot as plt
+
+import aiohttp 
+from homeassistant.helpers.entity import Entity
 import requests
+
+from custom_components.dawarizer.const import NOMINATIM_URL
+import matplotlib.pyplot as plt
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -54,13 +58,17 @@ class DawarizerSensor(Entity):
         return self._attributes
 
     def fetch_data(self, endpoint, params=None):
-        url = f"{self._api_url}"+f"{endpoint}"
+        url = f"{self._api_url}" + f"{endpoint}"
         headers = {
             "Authorization": f"Bearer {self._api_key}"
         }
-        response = requests.get(url, headers=headers, params=params)
-        response.raise_for_status()
-        return response.json()
+        # response = requests.get(url, headers=headers, params=params)
+        # response.raise_for_status()
+        # return response.json()
+        async with aiohttp.ClientSession() as session: 
+            async with session.get(url, headers=headers, params=params) as response: 
+                response.raise_for_status() 
+                return await response.json()
 
     
 class StatSensor(DawarizerSensor):

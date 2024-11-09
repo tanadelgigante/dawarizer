@@ -10,10 +10,11 @@
   ],
   "requirements": [
     "requests",
-    "matplotlib"
+    "matplotlib",
+    "aiohttp"
   ],
   "platforms": [
     "sensor"
-  ]
+  ],
   "iot_class": "cloud_polling"
 }
