@@ -1,4 +1,3 @@
-import asyncio 
 from datetime import datetime, timedelta
 import logging
 
@@ -57,17 +56,14 @@ class DawarizerSensor(Entity):
     def extra_state_attributes(self):
         return self._attributes
 
-    def fetch_data(self, endpoint, params=None):
-        url = f"{self._api_url}" + f"{endpoint}"
+    async def fetch_data(self, endpoint, params=None):
+        url = f"{self._api_url}{endpoint}"
         headers = {
             "Authorization": f"Bearer {self._api_key}"
         }
-        # response = requests.get(url, headers=headers, params=params)
-        # response.raise_for_status()
-        # return response.json()
-        async with aiohttp.ClientSession() as session: 
-            async with session.get(url, headers=headers, params=params) as response: 
-                response.raise_for_status() 
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers, params=params) as response:
+                response.raise_for_status()
                 return await response.json()
 
     
@@ -80,7 +76,7 @@ class StatSensor(DawarizerSensor):
 
     async def async_update(self):
         try:
-            data = self.fetch_data("/api/v1/stats")
+            data = await self.fetch_data("/api/v1/stats")
             self._state = data.get(self._stat_name)
         except Exception as e:
             _LOGGER.error(f"Error fetching data for {self._name}: {e}")
@@ -96,7 +92,7 @@ class YearlyStatsSensor(DawarizerSensor):
 
     async def async_update(self):
         try:
-            data = self.fetch_data("/api/v1/stats")
+            data = await self.fetch_data("/api/v1/stats")
             self._state = len(data.get(self._stat_name, []))
             self._attributes = {
                 "yearly_stats": data.get(self._stat_name, [])
@@ -114,7 +110,7 @@ class AreaCountSensor(DawarizerSensor):
 
     async def async_update(self):
         try:
-            data = self.fetch_data("/api/v1/areas")
+            data = await self.fetch_data("/api/v1/areas")
             self._state = len(data)
         except Exception as e:
             _LOGGER.error(f"Error fetching data for {self._name}: {e}")
@@ -129,7 +125,7 @@ class AreaNameSensor(DawarizerSensor):
 
     async def async_update(self):
         try:
-            data = self.fetch_data("/api/v1/areas")
+            data = await self.fetch_data("/api/v1/areas")
             area_names = []
             for area in data:
                 latitude = area["latitude"]
@@ -160,7 +156,7 @@ class PointsTotalSensor(DawarizerSensor):
 
     async def async_update(self):
         try:
-            data = self.fetch_data("/api/v1/points")
+            data = await self.fetch_data("/api/v1/points")
             self._state = len(data)
         except Exception as e:
             _LOGGER.error(f"Error fetching data for {self._name}: {e}")
@@ -177,7 +173,7 @@ class PointsLastDaySensor(DawarizerSensor):
         try:
             end_at = datetime.utcnow().isoformat()
             start_at = (datetime.utcnow() - timedelta(days=1)).isoformat()
-            data = self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
+            data = await self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
             self._state = len(data)
         except Exception as e:
             _LOGGER.error(f"Error fetching data for {self._name}: {e}")
@@ -194,7 +190,7 @@ class PointsLastMonthSensor(DawarizerSensor):
         try:
             end_at = datetime.utcnow().isoformat()
             start_at = (datetime.utcnow() - timedelta(days=30)).isoformat()
-            data = self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
+            data = await self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
             self._state = len(data)
         except Exception as e:
             _LOGGER.error(f"Error fetching data for {self._name}: {e}")
@@ -211,7 +207,7 @@ class PointsLastYearSensor(DawarizerSensor):
         try:
             end_at = datetime.utcnow().isoformat()
             start_at = (datetime.utcnow() - timedelta(days=365)).isoformat()
-            data = self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
+            data = await self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
             self._state = len(data)
         except Exception as e:
             _LOGGER.error(f"Error fetching data for {self._name}: {e}")
@@ -235,7 +231,7 @@ class HeatmapSensor(DawarizerSensor):
             elif self._period == "month":
                 start_at = (datetime.utcnow() - timedelta(days=30)).isoformat()
             
-            data = self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
+            data = await self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
 
             lats = [point["latitude"] for point in data]
             lons = [point["longitude"] for point in data]

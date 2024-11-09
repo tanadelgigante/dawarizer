@@ -11,7 +11,8 @@
   "requirements": [
     "requests",
     "matplotlib",
-    "aiohttp"
+    "aiohttp",
+    "asyncio"
   ],
   "platforms": [
     "sensor"
