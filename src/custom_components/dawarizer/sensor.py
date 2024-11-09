@@ -232,19 +232,25 @@ class HeatmapSensor(DawarizerSensor):
             
             data = await self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
 
-            lats = [point["latitude"] for point in data]
-            lons = [point["longitude"] for point in data]
+            # Filtrare i dati per ottenere solo valori numerici validi
+            lats = [point["latitude"] for point in data if isinstance(point["latitude"], (int, float))]
+            lons = [point["longitude"] for point in data if isinstance(point["longitude"], (int, float))]
 
-            plt.figure(figsize=(10, 6))
-            plt.hist2d(lons, lats, bins=[100, 100], cmap='hot')
-            plt.colorbar()
-            plt.xlabel("Longitude")
-            plt.ylabel("Latitude")
-            plt.title(f"Heatmap for the last {self._period}")
-            plt.savefig(f"/config/www/heatmap_{self._period}.png")
-            plt.close()
+            if lats and lons:  # Controlla se le liste non sono vuote
+                plt.figure(figsize=(10, 6))
+                plt.hist2d(lons, lats, bins=[100, 100], cmap='hot')
+                plt.colorbar()
+                plt.xlabel("Longitude")
+                plt.ylabel("Latitude")
+                plt.title(f"Heatmap for the last {self._period}")
+                plt.savefig(f"/config/www/heatmap_{self._period}.png")
+                plt.close()
 
-            self._state = f"/local/heatmap_{self._period}.png"
+                self._state = f"/local/heatmap_{self._period}.png"
+            else:
+                self._state = None
+                _LOGGER.warn(f"No valid data points for generating heatmap for {self._name}")
+
         except Exception as e:
             _LOGGER.error(f"Error generating heatmap for {self._name}: {e}")
             self._state = None
