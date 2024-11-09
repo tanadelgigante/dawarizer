@@ -15,8 +15,9 @@ CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.Schema(
             {
-                vol.Required("api_url"): str,
+                vol.Required("api_url"): str, 
                 vol.Required("api_key"): str,
+                vol.Optional("verify_ssl"):str,
             }
         )
     },
