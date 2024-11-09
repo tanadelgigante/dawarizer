@@ -59,12 +59,9 @@ class DawarizerSensor(Entity):
         return self._attributes
 
     async def fetch_data(self, endpoint, params=None):
-        url = f"{self._api_url}{endpoint}"
-        headers = {
-            "Authorization": f"Bearer {self._api_key}"
-        }
+        url = f"{self._api_url}{endpoint}?api_key={self._api_key}"
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, params=params, ssl=self._verify_ssl) as response:
+            async with session.get(url, ssl=self._verify_ssl) as response:
                 response.raise_for_status()
                 return await response.json()
 
