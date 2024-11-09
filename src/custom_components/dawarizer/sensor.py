@@ -169,7 +169,9 @@ class PointsTotalSensor(DawarizerSensor):
 
     async def update_sensor_data(self):
         try:
-            data = await self.fetch_data("/api/v1/points")
+            end_at = datetime.utcnow().isoformat()
+            start_at = (datetime.utcnow() - timedelta(days=10950)).isoformat()
+            data = await self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
             self._state = len(data)
         except Exception as e:
             _LOGGER.error(f"Error fetching data for {self._name}: {e}")

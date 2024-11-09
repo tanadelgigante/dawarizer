@@ -2,11 +2,11 @@
   "domain": "dawarizer",
   "name": "Dawarizer",
   "version": "1.0.0",
-  "documentation": "https://www.home-assistant.io/integrations/dawarizer",
-  "issue_tracker": "https://github.com/your-github-username/home-assistant-dawarizer/issues",
+  "documentation": "https://github.com/ilgigante77/dawarizer/README.md",
+  "issue_tracker": "https://github.com/ilgigante77/dawarizer/issues",
   "dependencies": [],
   "codeowners": [
-    "@your-github-username"
+    "@ilgigante77"
   ],
   "requirements": [
     "requests",
@@ -18,5 +18,5 @@
     "sensor"
   ],
   "iot_class": "cloud_polling", 
-  "icon": "custom_components/dawarizer/icon.png"
+  "icon": "custom_components/dawarizer/icon.svg"
 }
