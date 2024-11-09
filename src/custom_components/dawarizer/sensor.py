@@ -62,7 +62,7 @@ class DawarizerSensor(Entity):
             "Authorization": f"Bearer {self._api_key}"
         }
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers, params=params) as response:
+            async with session.get(url, headers=headers, params=params, ssl=False) as response:
                 response.raise_for_status()
                 return await response.json()
 
