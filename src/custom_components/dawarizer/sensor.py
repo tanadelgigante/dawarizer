@@ -23,7 +23,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         StatSensor(api_url, api_key, "totalCountriesVisited", "Total Countries Visited", verify_ssl, "mdi:flag"),
         StatSensor(api_url, api_key, "totalCitiesVisited", "Total Cities Visited", verify_ssl, "mdi:city"),
         AreaCountSensor(api_url, api_key, "Area Count", verify_ssl, "mdi:map"),
-        AreaNameSensor(api_url, api_key, "Area Names", verify_ssl), "mdi:map",
+        AreaNameSensor(api_url, api_key, "Area Names", verify_ssl, "mdi:map"),
         YearlyStatsSensor(api_url, api_key, "yearlyStats", "Yearly Stats", verify_ssl, "mdi:map-marker"),
         PointsTotalSensor(api_url, api_key, "Total Points", verify_ssl, "mdi:map-marker"),
         PointsLastDaySensor(api_url, api_key, "Points Last Day", verify_ssl, "mdi:map-marker"),
