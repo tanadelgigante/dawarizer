@@ -17,5 +17,6 @@
   "platforms": [
     "sensor"
   ],
-  "iot_class": "cloud_polling"
+  "iot_class": "cloud_polling", 
+  "icon": "custom_components/dawarizer/icon.png"
 }

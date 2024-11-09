@@ -17,35 +17,37 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     verify_ssl = hass.data["dawarizer"].get("verify_ssl", True)
 
     sensors = [
-        StatSensor(api_url, api_key, "totalDistanceKm", "Total Distance (Km)", verify_ssl),
-        StatSensor(api_url, api_key, "totalPointsTracked", "Total Points Tracked", verify_ssl),
-        StatSensor(api_url, api_key, "totalReverseGeocodedPoints", "Total Reverse Geocoded Points", verify_ssl),
-        StatSensor(api_url, api_key, "totalCountriesVisited", "Total Countries Visited", verify_ssl),
-        StatSensor(api_url, api_key, "totalCitiesVisited", "Total Cities Visited", verify_ssl),
-        AreaCountSensor(api_url, api_key, "Area Count", verify_ssl),
-        AreaNameSensor(api_url, api_key, "Area Names", verify_ssl),
-        YearlyStatsSensor(api_url, api_key, "yearlyStats", "Yearly Stats", verify_ssl),
-        PointsTotalSensor(api_url, api_key, "Total Points", verify_ssl),
-        PointsLastDaySensor(api_url, api_key, "Points Last Day", verify_ssl),
-        PointsLastMonthSensor(api_url, api_key, "Points Last Month", verify_ssl),
-        PointsLastYearSensor(api_url, api_key, "Points Last Year", verify_ssl),
-        HeatmapSensor(api_url, api_key, "Heatmap Last Day", "day", verify_ssl),
-        HeatmapSensor(api_url, api_key, "Heatmap Last Week", "week", verify_ssl),
-        HeatmapSensor(api_url, api_key, "Heatmap Last Month", "month", verify_ssl)
+        StatSensor(api_url, api_key, "totalDistanceKm", "Total Distance (Km)", verify_ssl, "mdi:map-marker-distance"),
+        StatSensor(api_url, api_key, "totalPointsTracked", "Total Points Tracked", verify_ssl, "mdi:map-marker-distance"),
+        StatSensor(api_url, api_key, "totalReverseGeocodedPoints", "Total Reverse Geocoded Points", verify_ssl, "mdi:map-search"),
+        StatSensor(api_url, api_key, "totalCountriesVisited", "Total Countries Visited", verify_ssl, "mdi:flag"),
+        StatSensor(api_url, api_key, "totalCitiesVisited", "Total Cities Visited", verify_ssl, "mdi:city"),
+        AreaCountSensor(api_url, api_key, "Area Count", verify_ssl, "mdi:map"),
+        AreaNameSensor(api_url, api_key, "Area Names", verify_ssl), "mdi:map",
+        YearlyStatsSensor(api_url, api_key, "yearlyStats", "Yearly Stats", verify_ssl, "mdi:map-marker"),
+        PointsTotalSensor(api_url, api_key, "Total Points", verify_ssl, "mdi:map-marker"),
+        PointsLastDaySensor(api_url, api_key, "Points Last Day", verify_ssl, "mdi:map-marker"),
+        PointsLastMonthSensor(api_url, api_key, "Points Last Month", verify_ssl, "mdi:map-marker"),
+        PointsLastYearSensor(api_url, api_key, "Points Last Year", verify_ssl, "mdi:map-marker"),
+        HeatmapSensor(api_url, api_key, "Heatmap Last Day", "day", verify_ssl, "mdi:heat-wave"),
+        HeatmapSensor(api_url, api_key, "Heatmap Last Week", "week", verify_ssl, "mdi:heat-wave"),
+        HeatmapSensor(api_url, api_key, "Heatmap Last Month", "month", verify_ssl, "mdi:heat-wave")
     ]
     add_entities(sensors, True)
 
 
 class DawarizerSensor(Entity):
 
-    def __init__(self, api_url, api_key, name, verify_ssl):
+    def __init__(self, api_url, api_key, name, verify_ssl, icon):
         self._api_url = api_url
         self._api_key = api_key
         self._verify_ssl = verify_ssl
         self._name = name
+        self._icon = icon
         self._state = None
         self._attributes = {}
-
+        self._last_updated = None
+        
     @property
     def name(self):
         return self._name
@@ -53,6 +55,10 @@ class DawarizerSensor(Entity):
     @property
     def state(self):
         return self._state
+
+    @property
+    def icon(self):
+        return self._icon
 
     @property
     def extra_state_attributes(self):
@@ -77,8 +83,8 @@ class DawarizerSensor(Entity):
 class StatSensor(DawarizerSensor):
     """Sensor for general statistics."""
 
-    def __init__(self, api_url, api_key, stat_name, name, verify_ssl):
-        super().__init__(api_url, api_key, name, verify_ssl)
+    def __init__(self, api_url, api_key, stat_name, name, verify_ssl, icon):
+        super().__init__(api_url, api_key, name, verify_ssl, icon)
         self._stat_name = stat_name
 
     async def update_sensor_data(self):
@@ -93,8 +99,8 @@ class StatSensor(DawarizerSensor):
 class YearlyStatsSensor(DawarizerSensor):
     """Sensor for yearly statistics."""
 
-    def __init__(self, api_url, api_key, stat_name, name, verify_ssl):
-        super().__init__(api_url, api_key, name, verify_ssl)
+    def __init__(self, api_url, api_key, stat_name, name, verify_ssl, icon):
+        super().__init__(api_url, api_key, name, verify_ssl, icon)
         self._stat_name = stat_name
 
     async def update_sensor_data(self):
@@ -112,8 +118,8 @@ class YearlyStatsSensor(DawarizerSensor):
 class AreaCountSensor(DawarizerSensor):
     """Sensor for the number of areas."""
 
-    def __init__(self, api_url, api_key, name, verify_ssl):
-        super().__init__(api_url, api_key, name, verify_ssl)
+    def __init__(self, api_url, api_key, name, verify_ssl, icon):
+        super().__init__(api_url, api_key, name, verify_ssl, icon)
 
     async def async_update(self):
         try:
@@ -127,8 +133,8 @@ class AreaCountSensor(DawarizerSensor):
 class AreaNameSensor(DawarizerSensor):
     """Sensor for the names of areas using geocoding."""
 
-    def __init__(self, api_url, api_key, name, verify_ssl):
-        super().__init__(api_url, api_key, name, verify_ssl)
+    def __init__(self, api_url, api_key, name, verify_ssl, icon):
+        super().__init__(api_url, api_key, name, verify_ssl, icon)
 
     async def update_sensor_data(self):
         try:
@@ -158,8 +164,8 @@ class AreaNameSensor(DawarizerSensor):
 class PointsTotalSensor(DawarizerSensor):
     """Sensor for the total number of points."""
 
-    def __init__(self, api_url, api_key, name, verify_ssl):
-        super().__init__(api_url, api_key, name, verify_ssl)
+    def __init__(self, api_url, api_key, name, verify_ssl, icon):
+        super().__init__(api_url, api_key, name, verify_ssl, icon)
 
     async def update_sensor_data(self):
         try:
@@ -173,8 +179,8 @@ class PointsTotalSensor(DawarizerSensor):
 class PointsLastDaySensor(DawarizerSensor):
     """Sensor for the number of points sent in the last day."""
 
-    def __init__(self, api_url, api_key, name, verify_ssl):
-        super().__init__(api_url, api_key, name, verify_ssl)
+    def __init__(self, api_url, api_key, name, verify_ssl, icon):
+        super().__init__(api_url, api_key, name, verify_ssl, icon)
 
     async def update_sensor_data(self):
         try:
@@ -190,8 +196,8 @@ class PointsLastDaySensor(DawarizerSensor):
 class PointsLastMonthSensor(DawarizerSensor):
     """Sensor for the number of points sent in the last month."""
 
-    def __init__(self, api_url, api_key, name, verify_ssl):
-        super().__init__(api_url, api_key, name, verify_ssl)
+    def __init__(self, api_url, api_key, name, verify_ssl, icon):
+        super().__init__(api_url, api_key, name, verify_ssl, icon)
 
     async def update_sensor_data(self):
         try:
@@ -207,8 +213,8 @@ class PointsLastMonthSensor(DawarizerSensor):
 class PointsLastYearSensor(DawarizerSensor):
     """Sensor for the number of points sent in the last year."""
 
-    def __init__(self, api_url, api_key, name, verify_ssl):
-        super().__init__(api_url, api_key, name, verify_ssl)
+    def __init__(self, api_url, api_key, name, verify_ssl, icon):
+        super().__init__(api_url, api_key, name, verify_ssl, icon)
 
     async def update_sensor_data(self):
         try:
@@ -224,8 +230,8 @@ class PointsLastYearSensor(DawarizerSensor):
 class HeatmapSensor(DawarizerSensor):
     """Sensor for generating heatmaps of the most frequented areas."""
 
-    def __init__(self, api_url, api_key, name, period, verify_ssl):
-        super().__init__(api_url, api_key, name, verify_ssl)
+    def __init__(self, api_url, api_key, name, period, verify_ssl, icon):
+        super().__init__(api_url, api_key, name, verify_ssl, icon)
         self._period = period
 
     async def update_sensor_data(self):
