@@ -23,4 +23,4 @@ The API token could be copied from the _Account_ section of your user.
 
 Then restart your Home Assistant instance.
 
-This component is not affiliated or related to Dawarich developers and is used for study of the Dawarich and Home Assistan capabilities. This component is intended "as-is" and the author is not responsible for malfunctioning or damaging of your systems. Any collaboration is welcome.
+This component is not affiliated or related to Dawarich developers and is used for study of the Dawarich and Home Assistant capabilities. This component is intended "as-is" and the author is not responsible for malfunctioning or damaging of your systems. Any collaboration is welcome.
