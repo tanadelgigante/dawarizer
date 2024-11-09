@@ -64,6 +64,14 @@ class DawarizerSensor(Entity):
             async with session.get(url, ssl=self._verify_ssl) as response:
                 response.raise_for_status()
                 return await response.json()
+    
+    async def async_update(self):
+        if self._last_updated is None or (datetime.utcnow() - self._last_updated) >= timedelta(days=1):
+            await self.update_sensor_data()
+            self._last_updated = datetime.utcnow()
+
+    async def update_sensor_data(self):
+        raise NotImplementedError("Subclasses should implement this method.")
 
     
 class StatSensor(DawarizerSensor):
@@ -73,7 +81,7 @@ class StatSensor(DawarizerSensor):
         super().__init__(api_url, api_key, name, verify_ssl)
         self._stat_name = stat_name
 
-    async def async_update(self):
+    async def update_sensor_data(self):
         try:
             data = await self.fetch_data("/api/v1/stats")
             self._state = data.get(self._stat_name)
@@ -89,7 +97,7 @@ class YearlyStatsSensor(DawarizerSensor):
         super().__init__(api_url, api_key, name, verify_ssl)
         self._stat_name = stat_name
 
-    async def async_update(self):
+    async def update_sensor_data(self):
         try:
             data = await self.fetch_data("/api/v1/stats")
             self._state = len(data.get(self._stat_name, []))
@@ -122,7 +130,7 @@ class AreaNameSensor(DawarizerSensor):
     def __init__(self, api_url, api_key, name, verify_ssl):
         super().__init__(api_url, api_key, name, verify_ssl)
 
-    async def async_update(self):
+    async def update_sensor_data(self):
         try:
             data = await self.fetch_data("/api/v1/areas")
             area_names = []
@@ -153,7 +161,7 @@ class PointsTotalSensor(DawarizerSensor):
     def __init__(self, api_url, api_key, name, verify_ssl):
         super().__init__(api_url, api_key, name, verify_ssl)
 
-    async def async_update(self):
+    async def update_sensor_data(self):
         try:
             data = await self.fetch_data("/api/v1/points")
             self._state = len(data)
@@ -168,7 +176,7 @@ class PointsLastDaySensor(DawarizerSensor):
     def __init__(self, api_url, api_key, name, verify_ssl):
         super().__init__(api_url, api_key, name, verify_ssl)
 
-    async def async_update(self):
+    async def update_sensor_data(self):
         try:
             end_at = datetime.utcnow().isoformat()
             start_at = (datetime.utcnow() - timedelta(days=1)).isoformat()
@@ -185,7 +193,7 @@ class PointsLastMonthSensor(DawarizerSensor):
     def __init__(self, api_url, api_key, name, verify_ssl):
         super().__init__(api_url, api_key, name, verify_ssl)
 
-    async def async_update(self):
+    async def update_sensor_data(self):
         try:
             end_at = datetime.utcnow().isoformat()
             start_at = (datetime.utcnow() - timedelta(days=30)).isoformat()
@@ -202,7 +210,7 @@ class PointsLastYearSensor(DawarizerSensor):
     def __init__(self, api_url, api_key, name, verify_ssl):
         super().__init__(api_url, api_key, name, verify_ssl)
 
-    async def async_update(self):
+    async def update_sensor_data(self):
         try:
             end_at = datetime.utcnow().isoformat()
             start_at = (datetime.utcnow() - timedelta(days=365)).isoformat()
@@ -220,7 +228,7 @@ class HeatmapSensor(DawarizerSensor):
         super().__init__(api_url, api_key, name, verify_ssl)
         self._period = period
 
-    async def async_update(self):
+    async def update_sensor_data(self):
         try:
             end_at = datetime.utcnow().isoformat()
             if self._period == "day":
@@ -233,8 +241,9 @@ class HeatmapSensor(DawarizerSensor):
             data = await self.fetch_data("/api/v1/points", params={"start_at": start_at, "end_at": end_at})
 
             # Filtrare i dati per ottenere solo valori numerici validi
-            lats = [point["latitude"] for point in data if isinstance(point["latitude"], (int, float))]
-            lons = [point["longitude"] for point in data if isinstance(point["longitude"], (int, float))]
+            valid_points = [point for point in data if isinstance(point.get("latitude"), (int, float)) and isinstance(point.get("longitude"), (int, float))]
+            lats = [point["latitude"] for point in valid_points]
+            lons = [point["longitude"] for point in valid_points]
 
             if lats and lons:  # Controlla se le liste non sono vuote
                 plt.figure(figsize=(10, 6))
@@ -249,7 +258,7 @@ class HeatmapSensor(DawarizerSensor):
                 self._state = f"/local/heatmap_{self._period}.png"
             else:
                 self._state = None
-                _LOGGER.warn(f"No valid data points for generating heatmap for {self._name}")
+                _LOGGER.warning(f"No valid data points for generating heatmap for {self._name}")
 
         except Exception as e:
             _LOGGER.error(f"Error generating heatmap for {self._name}: {e}")
