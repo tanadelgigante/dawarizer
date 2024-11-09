@@ -2,6 +2,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import discovery
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers import config_validation as cv
 import logging
 import requests
 import voluptuous as vol
@@ -17,7 +18,7 @@ CONFIG_SCHEMA = vol.Schema(
             {
                 vol.Required("api_url"): str, 
                 vol.Required("api_key"): str,
-                vol.Optional("verify_ssl"):str,
+                vol.Optional("verify_ssl", default=True): cv.boolean,
             }
         )
     },
