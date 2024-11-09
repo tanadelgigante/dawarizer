@@ -121,7 +121,7 @@ class AreaCountSensor(DawarizerSensor):
     def __init__(self, api_url, api_key, name, verify_ssl, icon):
         super().__init__(api_url, api_key, name, verify_ssl, icon)
 
-    async def async_update(self):
+    async def update_sensor_data(self):
         try:
             data = await self.fetch_data("/api/v1/areas")
             self._state = len(data)
