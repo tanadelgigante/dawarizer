@@ -1,5 +1,7 @@
 # dawarizer
 
+**ARCHIVED SINCE AN OFFICIAL HA INTEGRATION IS AVAILABLE**
+
 **Dawarizer** is a simple Home Assistant custom component that loads from a Dawarich installation the informations about:
 
 - Stats
